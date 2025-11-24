@@ -36,7 +36,7 @@ import {
 } from 'lucide-react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { InvoicePreviewDialog } from './components/invoice-preview-dialog'
 import { useInvoice } from '@/hooks/use-invoice'
 
@@ -44,6 +44,7 @@ const PassioInvoiceEditPage = () => {
   //#region Params
   const { code } = useParams<{ code: string }>()
   const dispatch = useDispatch()
+  const navigate = useNavigate();
   //#endregion
 
   //#region  Hooks
@@ -105,7 +106,7 @@ const PassioInvoiceEditPage = () => {
         amount: (group[0].unitPrice / 1.08) * quantitySum,
         quantity: quantitySum,
         property: '1',
-        Tax: 'GTGT 8%',
+        tax: '8%',
       })
     },
   )
@@ -139,7 +140,7 @@ const PassioInvoiceEditPage = () => {
       items: invoiceItems || [],
       taxTypes: [
         {
-          tax: 'GTGT 8%',
+          tax: '8%',
           amountWithoutTax: invoiceTotalAmountWithoutTax,
           taxAmount: invoiceTaxAmount,
         },
@@ -233,19 +234,20 @@ const PassioInvoiceEditPage = () => {
         return
       }
     }
-    console.log(data);
-    // try {
-    //   const result = await createInvoice.mutateAsync(data)
-    //   if (result.data.status >= 200 && result.data.status < 300) {
-    //     form.reset()
-    //     dispatch(handleSetNeedToFillCompanyInfo(false))
-    //     dispatch(handleSetPassioInvoicePreviewDialogState(false))
-    //   } else {
-    //     handleApiError(`${result.data.status}: ${result.data.message}`)
-    //   }
-    // } catch (error) {
-    //   handleApiError(error)
-    // }
+    // console.log(data);
+    try {
+      const result = await createInvoice.mutateAsync(data)
+      if (result.data.status >= 200 && result.data.status < 300) {
+        form.reset()
+        dispatch(handleSetNeedToFillCompanyInfo(false))
+        dispatch(handleSetPassioInvoicePreviewDialogState(false))
+        navigate('/passio-invoice')
+      } else {
+        handleApiError(`${result.data.status}: ${result.data.message}`)
+      }
+    } catch (error) {
+      handleApiError(error)
+    }
   }
   //#endregion
 

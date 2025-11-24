@@ -7,7 +7,7 @@ export const InvoiceDetailSchema = z.object({
     "buyerName": z.string().max(100).optional(), // Tên người mua
     "buyerAddress": z.string().max(200).optional(),
     "buyerFullName": z.string().max(100).optional(), // Tên đơn vị
-    "buyerPhoneNumber": z.string().max(15).optional(),
+    "buyerPhoneNumber": z.string().regex(/^[+]?[\d\s()-]{7,20}$/).optional(),
     "buyerEmail": z.string().email().max(100).optional(),
     "buyerIdNumber": z.string().max(20).optional(),
     "buyerPassportNumber": z.string().max(20).optional(),
