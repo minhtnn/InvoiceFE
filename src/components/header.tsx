@@ -1,4 +1,3 @@
-import { useTheme } from '@/providers/theme-provider'
 import { ChevronLeft } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
@@ -20,7 +19,7 @@ const HeaderMain = () => {
   return (
     <nav className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 sticky top-0 bg-sidebar/98 z-10">
       <div className="flex items-center gap-2 px-4 justify-between w-full">
-        <div className="flex items-center gap-2">
+        <div className="absolute left-0 flex items-center gap-2 px-4">
           {shouldShowBack() && (
             <>
               <TooltipProvider>
@@ -54,6 +53,9 @@ const HeaderMain = () => {
               </TooltipProvider>
             </>
           )}
+        </div>
+        <div className="mx-auto">
+          <img src="/passio_logo.png" alt="Logo" className="h-6" />
         </div>
       </div>
     </nav>

@@ -39,17 +39,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { InvoicePreviewDialog } from './components/invoice-preview-dialog'
 import { useInvoice } from '@/hooks/use-invoice'
+import { toast } from 'sonner'
 
 const PassioInvoiceEditPage = () => {
   //#region Params
   const { code } = useParams<{ code: string }>()
   const dispatch = useDispatch()
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   //#endregion
 
   //#region  Hooks
   const { getPassioOrderByCode } = usePassioOrder()
-  const { createInvoice } = useInvoice()
+  const { createInvoice, getTaxCodeInfo } = useInvoice()
   //#endregion
 
   //#region Redux
@@ -241,9 +242,34 @@ const PassioInvoiceEditPage = () => {
         form.reset()
         dispatch(handleSetNeedToFillCompanyInfo(false))
         dispatch(handleSetPassioInvoicePreviewDialogState(false))
+        toast.success('Tạo hóa đơn thành công')
         navigate('/passio-invoice')
       } else {
         handleApiError(`${result.data.status}: ${result.data.message}`)
+      }
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
+
+  const onSubmitTaxCode = async () => {
+    const taxCode = form.getValues().invoiceDetail.buyerTaxCode
+
+    if (!taxCode) {
+      toast.error('Vui lòng nhập mã số thuế để kiểm tra')
+      return
+    }
+
+    try {
+      const result = await getTaxCodeInfo.mutateAsync(taxCode)
+
+      if (result.data.status >= 200 && result.data.status < 300) {
+        const taxData = result.data.data
+        form.setValue('invoiceDetail.buyerFullName', taxData.fullName)
+        form.setValue('invoiceDetail.buyerAddress', taxData.addressLine)
+        toast.success('Lấy thông tin thành công')
+      } else {
+        toast.error('Mã số thuế không hợp lệ. Vui lòng kiểm tra lại.')
       }
     } catch (error) {
       handleApiError(error)
@@ -301,7 +327,7 @@ const PassioInvoiceEditPage = () => {
             <FileTextIcon className="w-4 h-4 text-watermelon-100" />
             <div className="text-base">Số bill:</div>
             <div className="tracking-wide leading-relaxed">
-              {orderData?.rentId || ''}
+              {orderData?.invoicePassioId || ''}
             </div>
           </div>
           <div className="flex items-center gap-2 space-x-2">
@@ -336,6 +362,8 @@ const PassioInvoiceEditPage = () => {
                     <Checkbox
                       onCheckedChange={handleCheckChange}
                       checked={needToFillCompanyInfo}
+                      className="data-[state=checked]:bg-chartreuse-100 
+                                 data-[state=checked]:border-chartreuse-100"
                     />
                     <Label className="tracking-widest leading-relaxed font-normal md:font-light">
                       Đơn vị không có Mã số thuế (Công ty nước ngoài/Đơn vị nhà
@@ -355,13 +383,23 @@ const PassioInvoiceEditPage = () => {
                             >
                               Mã số thuế
                             </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder=""
-                                {...field}
+                            <div className="flex gap-2">
+                              <FormControl>
+                                <Input
+                                  placeholder=""
+                                  {...field}
+                                  disabled={needToFillCompanyInfo}
+                                />
+                              </FormControl>
+                              <Button
+                                className="md:w-auto md:max-w-md bg-watermelon-100"
+                                type="button"
+                                onClick={onSubmitTaxCode}
                                 disabled={needToFillCompanyInfo}
-                              />
-                            </FormControl>
+                              >
+                                Kiểm tra
+                              </Button>
+                            </div>
                           </FormItem>
                         )
                       }}
