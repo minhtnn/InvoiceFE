@@ -10,12 +10,12 @@ export const ErrorFallback = ( { error, resetErrorBoundary }: FallbackProps ) =>
 
     return (
         <div className="relative w-full min-h-[200px] justify-center items-center flex flex-col">
-            <h2 className="text-2xl font-semibold mb-4">Có gì đó không ổn</h2>
+            <h2 className="text-2xl font-semibold mb-4">Đã xảy ra lỗi</h2>
             <p className="text-sm text-gray-500 mb-4">
                 Vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ nếu sự cố vẫn tiếp diễn.
             </p>
             {/* <ImageNotFound className="w-80 h-80 mx-auto mb-4" /> */}
-            <Button onClick={ resetErrorBoundary }>
+            <Button onClick={ resetErrorBoundary } className="bg-chartreuse-100 hover:bg-chartreuse-90 text-neutral-100">
                 <RefreshCw className="mr-2" />
                 Thử lại
             </Button>

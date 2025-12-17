@@ -1,7 +1,8 @@
 import { invoiceApi } from '@/apis/invoice.api'
 import {
   useMutation,
-  useQueryClient
+  useQueryClient,
+  useSuspenseQuery,
 } from '@tanstack/react-query'
 
 export const useInvoice = () => {
@@ -12,6 +13,8 @@ export const useInvoice = () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
-
-  return { createInvoice }
+  const getTaxCodeInfo = useMutation({
+    mutationFn: (code: string) => invoiceApi.getTaxCodeInfo(code),
+  })
+  return { createInvoice, getTaxCodeInfo }
 }
