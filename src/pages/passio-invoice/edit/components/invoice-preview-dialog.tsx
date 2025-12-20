@@ -189,7 +189,7 @@ export const InvoicePreviewDialog = (props: Props) => {
               <div className="flex justify-between gap-4">
                 <span>Tổng tiền hàng (chưa VAT):</span>
                 <span className="font-medium whitespace-nowrap">
-                  {formatCurrency(props.invoiceData.totalSaleAmount)}
+                  {formatCurrency(props.invoiceData.totalAmountWithoutDiscount)}
                 </span>
               </div>
               {props.invoiceData.totalDiscountAmount > 0 && (
@@ -203,7 +203,7 @@ export const InvoicePreviewDialog = (props: Props) => {
               <div className="flex justify-between gap-4">
                 <span>Tiền sau giảm giá:</span>
                 <span className="font-medium whitespace-nowrap">
-                  {formatCurrency(props.invoiceData.totalAmountWithoutTax)}
+                  {formatCurrency(props.invoiceData.totalAmountWithoutDiscount - props.invoiceData.totalDiscountAmount)}
                 </span>
               </div>
               {props.invoiceData.taxTypes.map((tax, index) => (
@@ -216,7 +216,7 @@ export const InvoicePreviewDialog = (props: Props) => {
               ))}
               <div className="flex justify-between gap-4 pt-2 border-t-2 text-base font-bold text-watermelon-100">
                 <span>Tổng thanh toán:</span>
-                <span className="whitespace-nowrap">{formatCurrency(props.invoiceData.totalAmount)}</span>
+                <span className="whitespace-nowrap">{formatCurrency(props.invoiceData.totalAmountAfterTax)}</span>
               </div>
             </div>
           </div>

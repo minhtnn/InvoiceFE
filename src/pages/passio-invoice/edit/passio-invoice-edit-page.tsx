@@ -79,13 +79,18 @@ const PassioInvoiceEditPage = () => {
   }
 
   var orderData = passioOrderData?.data.data
-  var invoiceFinalAmount = orderData?.finalAmount || 0
-  var invoiceTotalSaleAmount = orderData?.totalAmount / 1.08 || 0
+  var invoiceTotalAmountWithoutDiscount = orderData?.totalAmount / 1.08 || 0
   var invoiceTotalDiscountAmount =
-    (orderData?.discount + orderData?.discountOrderDetail) / 1.08 || 0
-  var invoiceTotalAmountWithoutTax =
-    invoiceTotalSaleAmount - invoiceTotalDiscountAmount || 0
-  var invoiceTaxAmount = invoiceTotalAmountWithoutTax * 0.08 || 0
+    (orderData?.discount + orderData?.discountOrderDetail) / 1.08 || 0;
+  var invoiceTotalAmount = (invoiceTotalAmountWithoutDiscount - invoiceTotalDiscountAmount) || 0
+  var invoiceTaxAmount = (invoiceTotalAmountWithoutDiscount - invoiceTotalDiscountAmount) * 0.08 || 0
+
+  // var invoiceFinalAmount = orderData?.finalAmount || 0
+  // var invoiceTotalAmountAfterTax = orderData?.totalAmount / 1.08 || 0
+  
+  // var invoiceTotalAmountWithoutTax =
+  //   invoiceTotalSaleAmount - invoiceTotalDiscountAmount || 0
+
   const groupMap = new Map<string, TPassioOrderDetailResponse[]>()
   orderData.passioOrderDetailResponses.forEach(
     (od: TPassioOrderDetailResponse) => {
@@ -118,12 +123,11 @@ const PassioInvoiceEditPage = () => {
       orderId: orderData.rentId,
       type: '1',
       paymentMethod: 'TM/CK',
-      totalSaleAmount: invoiceTotalSaleAmount,
+      totalAmountWithoutDiscount: invoiceTotalAmountWithoutDiscount,
       totalDiscountAmount: invoiceTotalDiscountAmount,
-      totalAmountWithoutTax: invoiceTotalAmountWithoutTax,
-      totalAmount: invoiceFinalAmount,
-      totalAmountAfterTax: 0,
-      totalTaxAmount: invoiceTotalAmountWithoutTax * 0.08,
+      totalAmount: invoiceTotalAmount,
+      totalTaxAmount: invoiceTaxAmount,
+      totalAmountAfterTax: invoiceTotalAmountWithoutDiscount - invoiceTotalDiscountAmount + invoiceTaxAmount,
       currencyExchangeRate: 1,
       partnerCode: 'VNP',
       storeCode: orderData?.storeCode || '',
@@ -142,7 +146,7 @@ const PassioInvoiceEditPage = () => {
       taxTypes: [
         {
           tax: '8%',
-          amountWithoutTax: invoiceTotalAmountWithoutTax,
+          amountWithoutTax: invoiceTotalAmountWithoutDiscount - invoiceTotalDiscountAmount,
           taxAmount: invoiceTaxAmount,
         },
       ],
@@ -183,7 +187,7 @@ const PassioInvoiceEditPage = () => {
         return // Dừng submit nếu có lỗi
       }
     }
-
+    // console.log(data)
     dispatch(handleSetPassioInvoicePreviewDialogState(true))
   }
   const handleCheckChange = (checked: boolean) => {
@@ -245,7 +249,8 @@ const PassioInvoiceEditPage = () => {
         toast.success('Tạo hóa đơn thành công')
         navigate('/passio-invoice')
       } else {
-        handleApiError(`${result.data.status}: ${result.data.message}`)
+        // handleApiError(`${result.data.status}: ${result.data.message}`)
+        toast.success(`${result.data.status}: ${result.data.message}`)
       }
     } catch (error) {
       handleApiError(error)
